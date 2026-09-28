@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌌 Astronomi Laboratuvarı | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="js/script.js"></script>
+    <style>
+        /* Astronomi Odasına Özel Tematik Renk ve Efekt Ayarları */
+        :root {
+            --astro-purple: #9b59b6;
+            --astro-blue: #34495e;
+            --astro-glow: rgba(155, 89, 182, 0.25);
+        }
+        .astro-banner {
+            text-align: center;
+            padding: 60px 20px 20px 20px;
+            position: relative;
+        }
+        .astro-title span {
+            color: var(--astro-purple) !important;
+            text-shadow: 0 0 10px var(--astro-glow);
+        }
+        .astro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .astro-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+        .astro-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--astro-purple);
+            box-shadow: 0 15px 30px var(--astro-glow);
+            background: rgba(155, 89, 182, 0.02);
+        }
+        .astro-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: float 4s ease-in-out infinite;
+        }
+        .astro-card:nth-child(2) .astro-icon { animation-delay: 1.3s; }
+        .astro-card:nth-child(3) .astro-icon { animation-delay: 2.5s; }
+        
+        .astro-btn {
+            background: linear-gradient(135deg, var(--astro-purple), #8e44ad);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            transition: opacity 0.3s, box-shadow 0.3s;
+        }
+        .astro-btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.4);
+        }
+        .xp-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(155, 89, 182, 0.2);
+            color: #d291bc;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starCanvas"></canvas>
+    <div class="background"></div>
+
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                🔬 <span>ScienceLab</span>
+            </a>
+        </div>
+        <nav class="navbar">
+            <a href="index.html">Ana Sayfa</a>
+            <a class="active" href="laboratories.html">Laboratuvarlar</a>
+            <a href="experiments.html">Deneyler</a>
+            <a href="about.html">Hakkımızda</a>
+            <a href="contact.html">İletişim</a>
+        </nav>
+        <div class="header-buttons">
+            <button id="themeToggle">🌙</button>
+            <a href="index.html" class="start-now">← Ana Sayfa</a>
+        </div>
+    </header>
+
+    <section class="astro-banner">
+        <div class="section-title astro-title">
+            <span>🌌 Uzay ve Evren</span>
+            <h2>Astronomi <span>Odası</span></h2>
+            <p>Gezegenlerin yörüngelerinden, ışığı bile yutan kara deliklerin gizemine kadar evreni keşfe çıkın.</p>
+        </div>
+    </section>
+
+    <main class="astro-grid">
+        
+        <div class="astro-card">
+            <div class="xp-tag">✨ +20 XP</div>
+            <div class="astro-icon">🪐</div>
+            <h3>Güneş Sistemi</h3>
+            <p>Gezegenleri yörüngelerine yerleştir, dönüş hızlarını ayarla ve Güneş'e olan uzaklıklarının mevsimlere etkisini canlı gözlemle.</p>
+            <a href="solar-system.html"><button class="astro-btn">Simülasyonu Başlat</button></a>
+        </div>
+
+        <div class="astro-card">
+            <div class="xp-tag">✨ +30 XP</div>
+            <div class="astro-icon">🕳️</div>
+            <h3>Kara Delik Çekimi</h3>
+            <p>Uzay-zaman düzlemine farklı kütlelerde yıldızlar ve asteroitler fırlatarak kütleçekimsel bükülmeyi ve olay ufkunu deneyimle.</p>
+            <a href="black-hole.html"><button class="astro-btn">Odayı Keşfet</button></a>
+        </div>
+
+        <div class="astro-card">
+            <div class="xp-tag">✨ +25 XP</div>
+            <div class="astro-icon">⭐</div>
+            <h3>Yıldız Evrimi</h3>
+            <p>Bir bulutsudan (nebula) başlayarak sıcaklık ve hidrojen yakıt miktarını yönet; yıldızını Süpernova'ya mı yoksa Beyaz Cüce'ye mi götüreceksin?</p>
+            <a href="star-cycle.html"><button class="astro-btn">Deneye Başla</button></a>
+        </div>
+
+    </main>
+
+    <button id="backToTop">⬆</button>
+
+    <footer>
+        <div class="footer-container">
+            <div>
+                <h2>🔬 ScienceLab</h2>
+                <p>Bilimi herkes için eğlenceli hale getiriyoruz.</p>
+            </div>
+            <div>
+                <h3>Bağlantılar</h3>
+                <a href="index.html">Ana Sayfa</a>
+                <a href="laboratories.html">Laboratuvarlar</a>
+                <a href="experiments.html">Deneyler</a>
+            </div>
+            <div>
+                <h3>Sosyal Medya</h3>
+                <a href="#">Instagram</a>
+                <a href="#">YouTube</a>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2026 ScienceLab • Tüm Hakları Saklıdır.
+        </div>
+    </footer>
+
+</body>
+</html>

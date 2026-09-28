@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔬 Etkileşimli Deneyler | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .exp-hero {
+            padding: 160px 8% 40px 8%;
+            text-align: center;
+            background: radial-gradient(circle at top, rgba(112, 0, 255, 0.1) 0%, transparent 60%);
+        }
+        .exp-hero h1 { font-size: 48px; font-weight: 800; margin-bottom: 15px; }
+        .exp-hero h1 span { color: var(--primary); }
+        .exp-hero p { color: var(--text-muted); max-width: 600px; margin: 0 auto; font-size: 16px; }
+
+        .exp-page-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 35px;
+            padding: 40px 8% 80px 8%;
+        }
+
+        /* Güçlendirilmiş Deney Kartları Tasarımı */
+        .page-exp-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 380px;
+        }
+        .page-exp-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px var(--primary-glow);
+        }
+
+        .card-top { position: relative; }
+        .page-exp-badge {
+            position: absolute; top: 0; right: 0;
+            font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 30px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge-easy { background: rgba(0, 255, 136, 0.1); color: #00ff88; }
+        .badge-medium { background: rgba(0, 210, 255, 0.1); color: #00d2ff; }
+        .badge-hard { background: rgba(255, 0, 127, 0.1); color: #ff007f; }
+
+        .page-exp-icon { font-size: 45px; margin-bottom: 20px; display: inline-block; }
+        .page-exp-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        .page-exp-card p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+
+        .page-exp-meta {
+            display: flex; gap: 15px; font-size: 12px; color: var(--text-muted);
+            margin-bottom: 20px; font-family: monospace;
+        }
+
+        .page-exp-btn {
+            width: 100%; background: transparent; border: 2px solid var(--primary);
+            color: var(--text-color); padding: 12px; border-radius: 30px; font-weight: 700;
+            cursor: pointer; text-align: center; text-decoration: none; transition: 0.3s ease;
+            display: block;
+        }
+        .page-exp-card:hover .page-exp-btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-color: transparent; color: #fff;
+            box-shadow: 0 5px 15px var(--primary-glow);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo"><a href="index.html">🔬 <span>ScienceLab</span></a></div>
+        <nav class="navbar">
+            <a href="index.html">Ana Sayfa</a>
+            <a href="laboratories.html">Laboratuvarlar</a>
+            <a class="active" href="experiments.html">Deneyler</a>
+            <a href="about.html">Hakkımızda</a>
+            <a href="contact.html">İletişim</a>
+        </nav>
+        <div class="header-buttons">
+            <button id="themeToggle">🌙</button>
+            <a href="laboratories.html" class="start-now">Laboratuvarlar →</a>
+        </div>
+    </header>
+
+    <div class="exp-hero">
+        <span>🔬 SİMÜLASYON KATALOĞU</span>
+        <h1>Etkileşimli <span>Deney</span> Kütüphanesi</h1>
+        <p>Teorik bilgileri gerçeğe dönüştüren dijital simülatörleri seç, parametreleri ayarla ve bilimi canlı olarak deneyimle.</p>
+    </div>
+
+    <div class="exp-page-grid">
+        
+        <div class="page-exp-card">
+            <div class="card-top">
+                <div class="page-exp-icon">🌋</div>
+                <div class="page-exp-badge badge-medium">ORTA DÜZEY</div>
+                <h2>Volkan Patlaması</h2>
+                <p>Asit ve baz reaksiyon dengesini kontrol ederek magmanın kinetik gaz çıkış gücünü parçacık motoruyla gözlemle.</p>
+            </div>
+            <div>
+                <div class="page-exp-meta">
+                    <span>⏱️ SÜRE: 5 DK</span>
+                    <span>🧪 DAL: KİMYA</span>
+                </div>
+                <a href="volcano.html" class="page-exp-btn">Deneyi Başlat</a>
+            </div>
+        </div>
+
+        <div class="page-exp-card">
+            <div class="card-top">
+                <div class="page-exp-icon">⚡</div>
+                <div class="page-exp-badge badge-easy">KOLAY DÜZEY</div>
+                <h2>Elektrik Devresi</h2>
+                <p>Voltaj ve direnç sürgülerini değiştirerek Ohm Kanunu'nu test et, kablolardaki elektron akış hızını canlı takip et.</p>
+            </div>
+            <div>
+                <div class="page-exp-meta">
+                    <span>⏱️ SÜRE: 3 DK</span>
+                    <span>⚛️ DAL: FİZİK</span>
+                </div>
+                <a href="electric.html" class="page-exp-btn">Deneyi Başlat</a>
+            </div>
+        </div>
+
+        <div class="page-exp-card">
+            <div class="card-top">
+                <div class="page-exp-icon">🚀</div>
+                <div class="page-exp-badge badge-hard">ZOR DÜZEY</div>
+                <h2>Roket Fırlatma</h2>
+                <p>İtki-kütle oranını, kargo yükünü ve yakıt miktarını hesapla. Karman çizgisini aşarak roketi Dünya yörüngesine oturt.</p>
+            </div>
+            <div>
+                <div class="page-exp-meta">
+                    <span>⏱️ SÜRE: 7 DK</span>
+                    <span>🌌 DAL: ASTRONOMİ</span>
+                </div>
+                <a href="rocket.html" class="page-exp-btn">Deneyi Başlat</a>
+            </div>
+        </div>
+
+    </div>
+
+    <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 40px;">© 2026 ScienceLab Simülatör Kataloğu</p>
+
+    <script>
+        const themeBtn = document.getElementById("themeToggle");
+        if (localStorage.getItem("theme") === "light") {
+            document.body.classList.add("light-mode");
+            if(themeBtn) themeBtn.textContent = "☀️";
+        }
+        if(themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                document.body.classList.toggle("light-mode");
+                if (document.body.classList.contains("light-mode")) {
+                    localStorage.setItem("theme", "light");
+                    themeBtn.textContent = "☀️";
+                } else {
+                    localStorage.setItem("theme", "dark");
+                    themeBtn.textContent = "🌙";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

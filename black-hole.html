@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕳️ Kara Delik Çekim Laboratuvarı | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="js/script.js"></script>
+    <style>
+        :root {
+            --astro-purple: #9b59b6;
+            --singularity: #000000;
+        }
+
+        .bh-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .bh-headline h2 {
+            color: var(--astro-purple);
+            margin-bottom: 10px;
+        }
+
+        .bh-headline p {
+            color: #aaa;
+            margin-bottom: 25px;
+        }
+
+        /* Simülasyon Alanı */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            margin: 0 auto;
+            background: #020208;
+            border-radius: 20px;
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .panel-ui {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .panel-ui span strong {
+            color: var(--astro-purple);
+        }
+
+        /* Başarı Bildirimi */
+        .success-banner {
+            display: none;
+            background: rgba(155, 89, 182, 0.15);
+            border: 1px solid var(--astro-purple);
+            color: #d291bc;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starCanvas"></canvas>
+    <div class="background"></div>
+
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">🔬 <span>ScienceLab</span></a>
+        </div>
+        <div class="header-buttons">
+            <a href="astronomy.html" class="start-now">← Laboratuvara Dön</a>
+        </div>
+    </header>
+
+    <main class="bh-container">
+        <div class="bh-headline">
+            <h2>🕳️ Kara Delik Çekim Laboratuvarı</h2>
+            <p>Uzay-zaman düzlemine asteroit fırlatmak için <strong>ekrana tıklayın</strong> ve kütleçekim bükülmesini izleyin!</p>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="bhCanvas"></canvas>
+        </div>
+
+        <div class="panel-ui">
+            <span>Yutulan Asteroit: <id strong id="swallowedCount">0</strong> / 3</span>
+            <span>Olay Ufku Çapı: <strong style="color: #e74c3c;">60px</strong></span>
+        </div>
+
+        <div class="success-banner" id="bhSuccess">
+            <h3>🎉 Singularity (Tekillik) Kaşifi!</h3>
+            <p>Olay ufkunu başarıyla test ettin ve uzay-zaman bükülmesini gözlemledin! Hesabına <strong>+30 XP</strong> eklendi.</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const canvas = document.getElementById("bhCanvas");
+            const ctx = canvas.getContext("2d");
+            const swallowedDisplay = document.getElementById("swallowedCount");
+            const successBanner = document.getElementById("bhSuccess");
+
+            // Çözünürlük ayarlama
+            function resizeCanvas() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            resizeCanvas();
+
+            // Kara Delik Merkezi Verileri
+            const blackHole = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                mass: 2500,        // Çekim gücü kuvveti
+                horizon: 30       // Olay ufku yarıçapı (yutulma sınırı)
+            };
+
+            let asteroids = [];
+            let swallowedAsteroids = 0;
+            let xpGranted = false;
+
+            // Asteroit Sınıfı
+            class Asteroid {
+                constructor(startX, startY) {
+                    this.x = startX;
+                    this.y = startY;
+                    // Fırlatıldığında rastgele bir ilk hız ve yön verelim
+                    this.vx = (Math.random() - 0.5) * 4 + (blackHole.y - startY) * 0.01;
+                    this.vy = (Math.random() - 0.5) * 4 - (blackHole.x - startX) * 0.01;
+                    this.radius = Math.random() * 3 + 2;
+                    this.color = `hsl(${Math.random() * 40 + 260}, 70%, 70%)`; // Mor/mavi tonlarında parlama
+                    this.trail = [];
+                }
+
+                update() {
+                    // Kuyruk efekti için geçmiş konumları kaydetme
+                    this.trail.push({ x: this.x, y: this.y });
+                    if (this.trail.length > 15) this.trail.shift();
+
+                    // Kara deliğe olan mesafeyi hesaplama (Vektörel Fizik)
+                    let dx = blackHole.x - this.x;
+                    let dy = blackHole.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < blackHole.horizon) {
+                        // Olay ufkundan içeri girdi, YUTULDU!
+                        swallowedAsteroids++;
+                        swallowedDisplay.textContent = swallowedAsteroids;
+                        checkXPReward();
+                        return false; 
+                    }
+
+                    // Newton'ın Kütleçekim Kanunu simülasyonu: F = G * (m1 * m2) / r^2
+                    let force = blackHole.mass / (distance * distance);
+                    // Hız vektörlerini güncelleme
+                    this.vx += (dx / distance) * force;
+                    this.vy += (dy / distance) * force;
+
+                    // Konumu güncelleme
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Eğer ekranın çok dışına çıkarsa silinsin
+                    if (distance > 1000) return false;
+
+                    return true;
+                }
+
+                draw() {
+                    // 1. Kuyruğu çiz
+                    ctx.beginPath();
+                    for (let i = 0; i < this.trail.length; i++) {
+                        let op = i / this.trail.length;
+                        ctx.strokeStyle = `rgba(155, 89, 182, ${op * 0.3})`;
+                        ctx.lineWidth = this.radius * op;
+                        if (i === 0) ctx.moveTo(this.trail[i].x, this.trail[i].y);
+                        else ctx.lineTo(this.trail[i].x, this.trail[i].y);
+                    }
+                    ctx.stroke();
+
+                    // 2. Çirdeği çiz
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.color;
+                    ctx.fill();
+                    ctx.shadowBlur = 0; // gölgeyi sıfırla
+                }
+            }
+
+            // Tıklayınca Asteroit Gönder
+            canvas.parentElement.addEventListener("click", (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+                asteroids.push(new Asteroid(clickX, clickY));
+            });
+
+            // Arka plandaki 2D Akreasyon (Işık) Diskini Çizme
+            function drawBlackHoleUI() {
+                // Çekim alanı bükülme çizgileri (Aura efekti)
+                let gradient = ctx.createRadialGradient(blackHole.x, blackHole.y, blackHole.horizon, blackHole.x, blackHole.y, blackHole.horizon * 4);
+                gradient.addColorStop(0, 'rgba(155, 89, 182, 0.8)');
+                gradient.addColorStop(0.2, 'rgba(142, 68, 173, 0.3)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                
+                ctx.beginPath();
+                ctx.arc(blackHole.x, blackHole.y, blackHole.horizon * 4, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                // Singularity (Olay Ufku - Merkez Karanlık)
+                ctx.beginPath();
+                ctx.arc(blackHole.x, blackHole.y, blackHole.horizon, 0, Math.PI * 2);
+                ctx.fillStyle = "#000000";
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = "#8e44ad";
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // Ana Oyun Döngüsü (Loop)
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Sahne elemanlarını çiz
+                drawBlackHoleUI();
+
+                // Asteroitleri güncelle ve çiz
+                asteroids = asteroids.filter(ast => {
+                    let keep = ast.update();
+                    if (keep) ast.draw();
+                    return keep;
+                });
+
+                requestAnimationFrame(loop);
+            }
+
+            // XP Ödül Kontrolü
+            function checkXPReward() {
+                if (swallowedAsteroids >= 3 && !xpGranted) {
+                    successBanner.style.display = "block";
+                    xpGranted = true;
+
+                    if (window.opener && typeof window.opener.gainXP === "function") {
+                        window.opener.gainXP(30);
+                    } else {
+                        let currentXP = parseInt(localStorage.getItem('scienceLab_xp')) || 0;
+                        localStorage.setItem('scienceLab_xp', currentXP + 30);
+                    }
+                }
+            }
+
+            // Pencere boyutu değiştiğinde merkezi güncelle
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                blackHole.x = canvas.width / 2;
+                blackHole.y = canvas.height / 2;
+            });
+
+            loop(); // Döngüyü Başlat
+        });
+    </script>
+
+</body>
+</html>

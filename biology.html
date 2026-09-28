@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 Biyoloji Laboratuvarı | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="js/script.js"></script>
+    <style>
+        /* Biyoloji Odasına Özel Tematik Renk ve Efekt Ayarları */
+        :root {
+            --biology-green: #2ecc71;
+            --biology-glow: rgba(46, 204, 113, 0.2);
+        }
+        .bio-banner {
+            text-align: center;
+            padding: 60px 20px 20px 20px;
+            position: relative;
+        }
+        .bio-title span {
+            color: var(--biology-green) !important;
+        }
+        .bio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .bio-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        .bio-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--biology-green);
+            box-shadow: 0 15px 30px var(--biology-glow);
+            background: rgba(46, 204, 113, 0.02);
+        }
+        .bio-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        .bio-card:nth-child(2) .bio-icon { animation-delay: 1s; }
+        .bio-card:nth-child(3) .bio-icon { animation-delay: 2s; }
+        
+        .bio-btn {
+            background: linear-gradient(135deg, var(--biology-green), #27ae60);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            transition: opacity 0.3s;
+        }
+        .bio-btn:hover {
+            opacity: 0.9;
+        }
+        .xp-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--biology-green);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starCanvas"></canvas>
+    <div class="background"></div>
+
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                🔬 <span>ScienceLab</span>
+            </a>
+        </div>
+        <nav class="navbar">
+            <a href="index.html">Ana Sayfa</a>
+            <a class="active" href="laboratories.html">Laboratuvarlar</a>
+            <a href="experiments.html">Deneyler</a>
+            <a href="about.html">Hakkımızda</a>
+            <a href="contact.html">İletişim</a>
+        </nav>
+        <div class="header-buttons">
+            <button id="themeToggle">🌙</button>
+            <a href="index.html" class="start-now">← Ana Sayfa</a>
+        </div>
+    </header>
+
+    <section class="bio-banner">
+        <div class="section-title bio-title">
+            <span>🧬 Yaşam Bilimi</span>
+            <h2>Biyoloji <span>Odası</span></h2>
+            <p>Mikro dünyadan makro ekosistemlere kadar yaşamın tüm sırlarını interaktif simülasyonlarla keşfedin.</p>
+        </div>
+    </section>
+
+    <main class="bio-grid">
+        
+        <div class="bio-card">
+            <div class="xp-tag">✨ +25 XP</div>
+            <div class="bio-icon">🧬</div>
+            <h3>DNA Eşleşmesi</h3>
+            <p>Adenin, Timin, Guanin ve Sitozin nükleotidlerini doğru bağlayarak kendi sarmalını oluştur ve genetik şifreyi çöz.</p>
+            <a href="dna-match.html"><button class="bio-btn">Simülasyonu Başlat</button></a>
+        </div>
+
+        <div class="bio-card">
+            <div class="xp-tag">✨ +20 XP</div>
+            <div class="bio-icon">🧫</div>
+            <h3>Hücre Yapısı ve Organeller</h3>
+            <p>3 boyutlu mikroskop görünümünde hücre organellerinin üzerine tıklayarak görevlerini öğren ve hücreyi inşa et.</p>
+            <a href="cell-structure.html"><button class="bio-btn">Odayı Keşfet</button></a>
+        </div>
+
+        <div class="bio-card">
+            <div class="xp-tag">✨ +30 XP</div>
+            <div class="bio-icon">🌱</div>
+            <h3>Fotosentez Hızı</h3>
+            <p>Işık yoğunluğunu, karbondioksit miktarını ve su seviyesini değiştirerek bitkinin oksijen üretimini canlı gözlemle.</p>
+            <a href="photosynthesis.html"><button class="bio-btn">Deneye Başla</button></a>
+        </div>
+
+    </main>
+
+    <button id="backToTop">⬆</button>
+
+    <footer>
+        <div class="footer-container">
+            <div>
+                <h2>🔬 ScienceLab</h2>
+                <p>Bilimi herkes için eğlenceli hale getiriyoruz.</p>
+            </div>
+            <div>
+                <h3>Bağlantılar</h3>
+                <a href="index.html">Ana Sayfa</a>
+                <a href="laboratories.html">Laboratuvarlar</a>
+                <a href="experiments.html">Deneyler</a>
+            </div>
+            <div>
+                <h3>Sosyal Medya</h3>
+                <a href="#">Instagram</a>
+                <a href="#">YouTube</a>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2026 ScienceLab • Tüm Hakları Saklıdır.
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧫 Hücre Yapısı ve Organeller | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="js/script.js"></script>
+    <style>
+        :root {
+            --bio-green: #2ecc71;
+            --organelle-blue: #3498db;
+        }
+
+        .cell-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .cell-headline h2 {
+            color: var(--bio-green);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .cell-headline p {
+            text-align: center;
+            color: #aaa;
+        }
+
+        /* İki Sütunlu Düzen */
+        .cell-workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .cell-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sol Taraf: İnteraktif Hücre Şeması */
+        .cell-diagram-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 400px;
+            position: relative;
+        }
+
+        /* Tıklanabilir Organel Butonları Grubu */
+        .organelle-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .organelle-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .organelle-btn:hover, .organelle-btn.active {
+            background: rgba(46, 204, 113, 0.15);
+            border-color: var(--bio-green);
+            transform: scale(1.03);
+        }
+
+        .organelle-btn.viewed {
+            border-left: 4px solid var(--bio-green);
+        }
+
+        /* Sağ Taraf: Mikroskop ve Bilgi Paneli */
+        .info-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+            position: relative;
+        }
+
+        .microscope-view {
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 3px solid var(--bio-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px var(--bio-green);
+        }
+
+        .info-panel h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .info-panel .nickname {
+            color: var(--bio-green);
+            font-weight: 600;
+            font-style: italic;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .info-panel p {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        /* Başarı Bildirimi */
+        .success-banner {
+            display: none;
+            grid-column: span 2;
+            background: rgba(46, 204, 113, 0.15);
+            border: 1px solid var(--bio-green);
+            color: var(--bio-green);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) { .success-banner { grid-column: span 1; } }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starCanvas"></canvas>
+    <div class="background"></div>
+
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">🔬 <span>ScienceLab</span></a>
+        </div>
+        <div class="header-buttons">
+            <a href="biology.html" class="start-now">← Laboratuvara Dön</a>
+        </div>
+    </header>
+
+    <main class="cell-container">
+        <div class="cell-headline">
+            <h2>🧫 Hücre Yapısı ve Organel Laboratuvarı</h2>
+            <p>Mikroskop altındaki organelleri seçerek yapılarını incele ve hücrenin nasıl çalıştığını keşfet!</p>
+        </div>
+
+        <div class="cell-workspace">
+            
+            <div class="cell-diagram-box">
+                <div style="font-size: 5rem; margin-bottom: 10px; animation: float 4s ease-in-out infinite;">🧬</div>
+                <div style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">İncelemek istediğiniz organele tıklayın:</div>
+                
+                <div class="organelle-selector-grid">
+                    <button class="organelle-btn" data-target="nucleus"><span>🧠</span> Çekirdek</button>
+                    <button class="organelle-btn" data-target="mitochondria"><span>⚡</span> Mitokondri</button>
+                    <button class="organelle-btn" data-target="ribosome"><span>🏭</span> Ribozom</button>
+                    <button class="organelle-btn" data-target="golgi"><span>📦</span> Golgi Aygıtı</button>
+                    <button class="organelle-btn" data-target="vacuole"><span>💧</span> Koful</button>
+                    <button class="organelle-btn" data-target="lysosome"><span>♻️</span> Lizozom</button>
+                </div>
+            </div>
+
+            <div class="info-panel" id="infoPanel">
+                <div class="microscope-view" id="microIcon">🔬</div>
+                <h3 id="organelleName">Başlamak İçin Seçim Yapın</h3>
+                <span class="nickname" id="organelleNickname">Hücrenin Gizemli Dünyası</span>
+                <p id="organelleDesc">Sol panelde bulunan organellerden birine tıklayarak onun hücre içerisindeki hayati görevlerini, yapısını ve mikroskobik özelliklerini anında öğrenebilirsin.</p>
+            </div>
+
+            <div class="success-banner" id="cellSuccess">
+                <h3>🎉 Tebrikler! Tüm Organelleri Keşfettin!</h3>
+                <p>Hücrenin biyolojik yapısını başarıyla inceledin ve profil hanene <strong>+20 XP</strong> eklendi!</p>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Organel Veri Tabanı
+        const organelleData = {
+            nucleus: {
+                name: "Çekirdek",
+                nickname: "👑 Hücrenin Yönetim Merkezi (Yönetici)",
+                icon: "🧠",
+                desc: "Hücrenin kalbidir ve tüm yaşamsal faaliyetleri (büyüme, bölünme, onarım) yönetir. İçerisinde canlıya ait kalıtsal bilgileri taşıyan DNA sarmalı bulunur. Bir şirketin genel müdürü gibidir."
+            },
+            mitochondria: {
+                name: "Mitokondri",
+                nickname: "⚡ Hücrenin Enerji Santrali",
+                icon: "⚡",
+                desc: "Oksijenli solunum yaparak hücrenin ihtiyaç duyduğu ATP (enerji) moleküllerini üretir. Enerji ihtiyacı fazla olan kas ve karaciğer hücrelerinde sayıları oldukça yüksektir."
+            },
+            ribosome: {
+                name: "Ribozom",
+                nickname: "🏭 Protein Fabrikası",
+                icon: "🏭",
+                desc: "Hücrenin en küçük ve zarsız organelidir. Amino asitleri bir araya getirerek hücrenin yapı taşı olan proteinleri sentezler. Tüm canlı hücrelerde ortak olarak bulunur."
+            },
+            golgi: {
+                name: "Golgi Aygıtı",
+                nickname: "📦 Paketleme ve Salgı Ofisi",
+                icon: "📦",
+                desc: "Endoplazmik retikulumdan gelen maddeleri üst üste yığılmış yassı kesecikler halinde salgılar, paketler ve depolar. Tükürük ve ter bezi gibi salgı üreten hücrelerde bolca bulunur."
+            },
+            vacuole: {
+                name: "Koful",
+                nickname: "💧 Hücrenin Depolama Deposu",
+                icon: "💧",
+                desc: "Hücre içerisindeki fazla suları, besinleri veya atık maddeleri depolayan keselerdir. Bitki hücrelerinde büyük ve az sayıda iken, hayvan hücrelerinde küçük ve çok sayıdadır."
+            },
+            lysosome: {
+                name: "Lizozom",
+                nickname: "♻️ Hücre İçi Sindirim ve Geri Dönüşüm Sistemi",
+                icon: "♻️",
+                desc: "İçerdiği güçlü sindirim enzimleri sayesinde hücreye giren yabancı maddeleri, yaşlanmış ve yıpranmış organelleri parçalayarak yok eder. Hücrenin temizlik görevlisidir."
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const buttons = document.querySelectorAll('.organelle-btn');
+            const viewedOrganelles = new Set(); // İncelenenleri benzersiz tutmak için
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Aktiflik sınıfını güncelle
+                    buttons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active', 'viewed');
+
+                    const target = btn.getAttribute('data-target');
+                    const data = organelleData[target];
+
+                    if (data) {
+                        // Sağ paneli güncelle
+                        document.getElementById('microIcon').textContent = data.icon;
+                        document.getElementById('organelleName').textContent = data.name;
+                        document.getElementById('organelleNickname').textContent = data.nickname;
+                        document.getElementById('organelleDesc').textContent = data.desc;
+
+                        // İncelenenlere ekle
+                        viewedOrganelles.add(target);
+
+                        // Tüm organeller (6 adet) incelendi mi kontrolü
+                        if (viewedOrganelles.size === buttons.length) {
+                            const successBanner = document.getElementById('cellSuccess');
+                            if (successBanner.style.display !== 'block') {
+                                successBanner.style.display = 'block';
+                                
+                                // XP verme mekanizması
+                                if (window.opener && typeof window.opener.gainXP === "function") {
+                                    window.opener.gainXP(20);
+                                } else {
+                                    let currentXP = parseInt(localStorage.getItem('scienceLab_xp')) || 0;
+                                    localStorage.setItem('scienceLab_xp', currentXP + 20);
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

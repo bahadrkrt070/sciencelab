@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Sanal Laboratuvarlar | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Laboratuvar Sayfasına Özel Fütüristik CSS Tasarımları */
+        .labs-hero {
+            padding: 160px 8% 60px 8%;
+            text-align: center;
+            background: radial-gradient(circle at top, rgba(0, 210, 255, 0.1) 0%, transparent 60%);
+        }
+        .labs-hero h1 { font-size: 48px; font-weight: 800; margin-bottom: 15px; }
+        .labs-hero h1 span { color: var(--primary); }
+        .labs-hero p { color: var(--text-muted); max-width: 600px; margin: 0 auto; font-size: 16px; }
+
+        .labs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
+            padding: 40px 8% 80px 8%;
+        }
+
+        .lab-room-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 35px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 400px;
+        }
+
+        /* Farklı laboratuvar odalarına özel neon parlama efektleri */
+        .lab-room-card.physics:hover { box-shadow: 0 15px 35px rgba(0, 210, 255, 0.25); border-color: #00d2ff; }
+        .lab-room-card.chemistry:hover { box-shadow: 0 15px 35px rgba(0, 255, 136, 0.25); border-color: #00ff88; }
+        .lab-room-card.biology:hover { box-shadow: 0 15px 35px rgba(255, 0, 127, 0.25); border-color: #ff007f; }
+        .lab-room-card.astronomy:hover { box-shadow: 0 15px 35px rgba(112, 0, 255, 0.25); border-color: #7000ff; }
+        
+        .lab-room-card:hover { transform: translateY(-10px); }
+
+        .lab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .lab-icon { font-size: 45px; }
+        .lab-status { 
+            font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 30px; 
+            text-transform: uppercase; letter-spacing: 1px;
+            background: rgba(255,255,255,0.05); color: var(--text-muted);
+        }
+        .active-status { background: rgba(0, 255, 136, 0.1); color: #00ff88; }
+
+        .lab-info h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+        .lab-info p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
+
+        /* Canlı İstatistik Göstergeleri (Telemetri) */
+        .lab-telemetry {
+            display: flex; justify-content: space-between;
+            background: rgba(0,0,0,0.15); padding: 12px 18px; border-radius: 14px;
+            font-family: monospace; font-size: 12px; border: 1px solid rgba(255,255,255,0.02);
+            margin-bottom: 25px;
+        }
+        .tel-item span { display: block; color: var(--text-muted); font-size: 10px; text-transform: uppercase; }
+        .tel-item strong { color: var(--text-color); font-size: 13px; }
+
+        .enter-lab-btn {
+            width: 100%; padding: 12px; border-radius: 30px; border: none;
+            font-weight: 700; font-size: 15px; cursor: pointer; text-align: center; text-decoration: none;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        .physics .enter-lab-btn { background: rgba(0, 210, 255, 0.1); color: #00d2ff; border: 1px solid #00d2ff; }
+        .physics:hover .enter-lab-btn { background: #00d2ff; color: #fff; }
+
+        .chemistry .enter-lab-btn { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid #00ff88; }
+        .chemistry:hover .enter-lab-btn { background: #00ff88; color: #05070c; }
+
+        .biology .enter-lab-btn { background: rgba(255, 0, 127, 0.1); color: #ff007f; border: 1px solid #ff007f; }
+        .biology:hover .enter-lab-btn { background: #ff007f; color: #fff; }
+
+        .astronomy .enter-lab-btn { background: rgba(112, 0, 255, 0.1); color: #7000ff; border: 1px solid #7000ff; }
+        .astronomy:hover .enter-lab-btn { background: #7000ff; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo"><a href="index.html">🔬 <span>ScienceLab</span></a></div>
+        <nav class="navbar">
+            <a href="index.html">Ana Sayfa</a>
+            <a class="active" href="laboratories.html">Laboratuvarlar</a>
+            <a href="experiments.html">Deneyler</a>
+            <a href="about.html">Hakkımızda</a>
+            <a href="contact.html">İletişim</a>
+        </nav>
+        <div class="header-buttons">
+            <button id="themeToggle">🌙</button>
+            <a href="experiments.html" class="start-now">Deneyler →</a>
+        </div>
+    </header>
+
+    <div class="labs-hero">
+        <span>🧪 AR-GE MERKEZİ</span>
+        <h1>Sanal <span>Laboratuvar</span> Odaları</h1>
+        <p>Bilim dallarına göre özelleştirilmiş, fütüristik simülasyon cihazları ve interaktif test araçlarıyla donatılmış odaları keşfet.</p>
+    </div>
+
+    <div class="labs-grid">
+        
+        <div class="lab-room-card physics">
+            <div class="lab-header">
+                <div class="lab-icon">⚛️</div>
+                <div class="lab-status active-status">● 2 DENEY AKTİF</div>
+            </div>
+            <div class="lab-info">
+                <h2>Fizik Odası</h2>
+                <p>Kuvvet, manyetizma, elektrik devreleri ve kinetik enerji kanunlarını gerçekçi formüllerle test et.</p>
+            </div>
+            <div>
+                <div class="lab-telemetry">
+                    <div class="tel-item"><span>SIM_HIZI</span><strong>120 FPS</strong></div>
+                    <div class="tel-item"><span>KAŞİFLER</span><strong>1.420 Kişi</strong></div>
+                    <div class="tel-item"><span>KARMAN</span><strong>GÜVENLİ</strong></div>
+                </div>
+                <a href="electric.html" class="enter-lab-btn">Odaya Giriş Yap</a>
+            </div>
+        </div>
+
+        <div class="lab-room-card chemistry">
+            <div class="lab-header">
+                <div class="lab-icon">🧪</div>
+                <div class="lab-status active-status">● 1 DENEY AKTİF</div>
+            </div>
+            <div class="lab-info">
+                <h2>Kimya Odası</h2>
+                <p>Asit-baz tepkimelerini, element bağlarını ve sanal periyodik tablo bileşenlerini güvenle karıştır.</p>
+            </div>
+            <div>
+                <div class="lab-telemetry">
+                    <div class="tel-item"><span>REAKS_HIZI</span><strong>ANLIK</strong></div>
+                    <div class="tel-item"><span>KAŞİFLER</span><strong>2.950 Kişi</strong></div>
+                    <div class="tel-item"><span>PH_METRE</span><strong>DİNAMİK</strong></div>
+                </div>
+                <a href="volcano.html" class="enter-lab-btn">Odaya Giriş Yap</a>
+            </div>
+        </div>
+
+        <div class="lab-room-card biology">
+            <div class="lab-header">
+                <div class="lab-icon">🧬</div>
+                <div class="lab-status">YAKINDA</div>
+            </div>
+            <div class="lab-info">
+                <h2>Biyoloji Odası</h2>
+                <p>Hücre bölünmesi, DNA sarmal yapıları ve insan anatomisini mikro düzeyde büyüterek gözlemle.</p>
+            </div>
+            <div>
+                <div class="lab-telemetry">
+                    <div class="tel-item"><span>BÜYÜTME</span><strong>x10000</strong></div>
+                    <div class="tel-item"><span>KAŞİFLER</span><strong>0 Kişi</strong></div>
+                    <div class="tel-item"><span>GEN_DİZİM</span><strong>KİLİTLİ</strong></div>
+                </div>
+                <button class="enter-lab-btn" onclick="alert('🧬 Biyoloji Laboratuvarı odamız ve DNA simülatörümüz çok yakında hizmete açılacaktır!')">Odayı Kalibre Et</button>
+            </div>
+        </div>
+
+        <div class="lab-room-card astronomy">
+            <div class="lab-header">
+                <div class="lab-icon">🌌</div>
+                <div class="lab-status active-status">● 1 DENEY AKTİF</div>
+            </div>
+            <div class="lab-info">
+                <h2>Uzay Odası</h2>
+                <p>Yerçekimi yörüngelerini, roket fırlatma itki dinamiklerini ve Güneş Sistemi ölçeklerini simüle et.</p>
+            </div>
+            <div>
+                <div class="lab-telemetry">
+                    <div class="tel-item"><span>YÖRÜNGE</span><strong>%100 KARARLI</strong></div>
+                    <div class="tel-item"><span>KAŞİFLER</span><strong>4.110 Kişi</strong></div>
+                    <div class="tel-item"><span>TELESKOP</span><strong>AKTİF</strong></div>
+                </div>
+                <a href="rocket.html" class="enter-lab-btn">Odaya Giriş Yap</a>
+            </div>
+        </div>
+
+    </div>
+
+    <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 40px;">© 2026 ScienceLab Laboratuvar Yönetim Ağı</p>
+
+    <script>
+        const themeBtn = document.getElementById("themeToggle");
+        if (localStorage.getItem("theme") === "light") {
+            document.body.classList.add("light-mode");
+            if(themeBtn) themeBtn.textContent = "☀️";
+        }
+        if(themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                document.body.classList.toggle("light-mode");
+                if (document.body.classList.contains("light-mode")) {
+                    localStorage.setItem("theme", "light");
+                    themeBtn.textContent = "☀️";
+                } else {
+                    localStorage.setItem("theme", "dark");
+                    themeBtn.textContent = "🌙";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

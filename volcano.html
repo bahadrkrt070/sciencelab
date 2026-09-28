@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌋 Profesyonel Volkan Simülasyonu | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .sim-container { display: flex; gap: 40px; margin-top: 120px; padding: 0 8%; align-items: stretch; }
+        
+        /* Simülasyon Ekranı - Karanlık Laboratuvar Atmosferi */
+        .sim-screen { 
+            flex: 1.3; 
+            background: #090d16; 
+            border: 2px solid rgba(255, 51, 0, 0.2); 
+            border-radius: 24px; 
+            height: 550px; 
+            position: relative; 
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+        }
+        
+        /* Arka plandaki Canvas - Lav Parçacıkları En Önde Olmalı */
+        #volcanoCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 4; 
+            pointer-events: none;
+        }
+
+        /* SVG ile Kusursuz Volkan Dağı */
+        .volcano-svg {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 450px;
+            height: auto;
+            z-index: 2;
+            filter: drop-shadow(0 -5px 15px rgba(0,0,0,0.5));
+        }
+
+        /* Kumanda Paneli */
+        .sim-controls { flex: 0.7; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 35px; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .control-group { margin-bottom: 25px; }
+        .control-group label { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; font-size: 14px; }
+        .control-group label span { color: var(--primary); }
+        .control-group input[type="range"] { 
+            width: 100%; -webkit-appearance: none; background: rgba(255,255,255,0.1); height: 8px; border-radius: 5px; outline: none;
+        }
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 0 10px var(--primary-glow);
+        }
+        
+        .action-btn { 
+            width: 100%; background: linear-gradient(135deg, #ff2a00, #ff7a00); color: white; border: none; padding: 16px; border-radius: 30px; font-weight: 700; font-size: 16px; cursor: pointer; 
+            box-shadow: 0 6px 20px rgba(255,42,0,0.4); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,42,0,0.6); }
+        .action-btn:active { transform: translateY(-1px); }
+        
+        .reset-btn { width: 100%; background: transparent; border: 2px solid var(--card-border); color: var(--text-color); padding: 12px; border-radius: 30px; font-weight: 600; margin-top: 12px; cursor: pointer; transition: 0.2s; }
+        .reset-btn:hover { background: rgba(255,255,255,0.05); border-color: var(--text-muted); }
+
+        #resultInfo {
+            background: rgba(255,255,255,0.02); border-left: 4px solid var(--card-border); padding: 15px; border-radius: 0 12px 12px 0; font-size: 14px; color: var(--text-muted); line-height: 1.6;
+        }
+
+        /* Quiz Kutusu */
+        .quiz-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; margin: 40px 8% 50px 8%; padding: 40px; }
+        .quiz-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 25px; }
+        .quiz-option { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); padding: 18px 25px; border-radius: 14px; cursor: pointer; transition: all 0.2s ease; font-weight: 500; }
+        .quiz-option:hover { background: rgba(0, 210, 255, 0.05); border-color: var(--primary); transform: translateX(5px); }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo"><a href="index.html">🔬 <span>ScienceLab</span></a></div>
+        <nav class="navbar">
+            <a href="index.html">Ana Sayfa</a>
+            <a href="laboratories.html">Laboratuvarlar</a>
+            <a class="active" href="experiments.html">Deneyler</a>
+            <a href="about.html">Hakkımızda</a>
+            <a href="contact.html">İletişim</a>
+        </nav>
+        <div class="header-buttons">
+            <button id="themeToggle">🌙</button>
+            <a href="index.html" class="start-now">← Geri Dön</a>
+        </div>
+    </header>
+
+    <div class="sim-container">
+        <div class="sim-screen" id="simScreen">
+            <canvas id="volcanoCanvas"></canvas>
+            
+            <svg class="volcano-svg" viewBox="0 0 500 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 300L210 80C215 75 225 72 235 72H265C275 72 285 75 290 80L450 300H50Z" fill="#2c1e16"/>
+                <path d="M180 120L215 80H285L320 120L295 150L270 110L250 140L230 105L205 135L180 120Z" fill="#1e140e"/>
+                <path d="M220 72H280V80H220V72Z" fill="#ff3300" opacity="0.8"/>
+            </svg>
+        </div>
+
+        <div class="sim-controls">
+            <div>
+                <span style="color: #ff4500; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Kimyasal Simülatör Pro</span>
+                <h2 style="margin: 5px 0 25px 0; font-weight: 800;">Volkanik Reaksiyon</h2>
+                
+                <div class="control-group">
+                    <label>Sirke Oranı (Asit) <span id="vinegarVal">50 ml</span></label>
+                    <input type="range" id="vinegar" min="10" max="100" value="50">
+                </div>
+
+                <div class="control-group">
+                    <label>Karbonat Oranı (Baz) <span id="bakingSodaVal">50 gr</span></label>
+                    <input type="range" id="bakingSoda" min="10" max="100" value="50">
+                </div>
+            </div>
+
+            <div>
+                <button id="eruptBtn" class="action-btn">🌋 Tepkimeyi Başlat</button>
+                <button id="resetBtn" class="reset-btn">🔄 Temizle</button>
+                
+                <div id="resultInfo" style="margin-top: 25px;">
+                    Sürgülerle kimyasal oranları belirle ve "Tepkimeyi Başlat" butonuna dokunarak kinetik gaz çıkışını izle.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="quiz-section">
+        <span style="color: #ff2a00; font-weight: 700; font-size: 14px; text-transform: uppercase;">🧠 Bilim Laboratuvarı Değerlendirmesi</span>
+        <h2 style="margin: 8px 0 15px 0; font-weight: 800;">Sirke ve Karbonat karıştığında açığa çıkan gaz hangisidir?</h2>
+        
+        <div class="quiz-grid">
+            <div class="quiz-option" onclick="checkAnswer(false, this)">A) Oksijen (O₂)</div>
+            <div class="quiz-option" onclick="checkAnswer(true, this)">B) Karbondioksit (CO₂)</div>
+            <div class="quiz-option" onclick="checkAnswer(false, this)">C) Azot Protoksit (N₂O)</div>
+        </div>
+    </section>
+
+    <script>
+        const vinegarInput = document.getElementById('vinegar');
+        const bakingSodaInput = document.getElementById('bakingSoda');
+        const vinegarVal = document.getElementById('vinegarVal');
+        const bakingSodaVal = document.getElementById('bakingSodaVal');
+        
+        vinegarInput.oninput = () => vinegarVal.textContent = vinegarInput.value + " ml";
+        bakingSodaInput.oninput = () => bakingSodaVal.textContent = bakingSodaInput.value + " gr";
+
+        // CANVAS PARÇACIK AYARLARI
+        const canvas = document.getElementById('volcanoCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationFrame;
+        let isErupting = false;
+        let eruptionIntensity = 0;
+
+        function resizeCanvas() {
+            // Doğrudan kapsayıcı ekrandan pikselleri zorla eşitleyen yapı
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class LavaParticle {
+            constructor() {
+                this.x = canvas.width / 2 + (Math.random() * 20 - 10);
+                this.y = canvas.height - 250; // Krater ağzı yüksekliği tam ayarlandı
+                this.size = Math.random() * 4 + 2;
+                
+                const angle = (Math.random() * 40 + 70) * Math.PI / 180; 
+                const force = (Math.random() * 5 + 4) * (eruptionIntensity / 50);
+                
+                this.vx = Math.cos(angle) * (Math.random() - 0.5) * force * 0.5;
+                this.vy = -Math.sin(angle) * force;
+                this.gravity = 0.15;
+                this.alpha = 1;
+                this.color = `hsl(${Math.random() * 35 + 10}, 100%, 50%)`;
+            }
+
+            update() {
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= 0.012; 
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (isErupting) {
+                for (let i = 0; i < Math.floor(eruptionIntensity / 15); i++) {
+                    particles.push(new LavaParticle());
+                }
+            }
+
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) particles.splice(index, 1);
+            });
+
+            animationFrame = requestAnimationFrame(animate);
+        }
+
+        // Kontroller
+        const eruptBtn = document.getElementById('eruptBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultInfo = document.getElementById('resultInfo');
+
+        eruptBtn.onclick = () => {
+            const acid = parseInt(vinegarInput.value);
+            const base = parseInt(bakingSodaInput.value);
+            eruptionIntensity = acid + base;
+
+            isErupting = true;
+            cancelAnimationFrame(animationFrame);
+            animate();
+
+            if (eruptionIntensity > 150) {
+                resultInfo.style.borderLeftColor = "#ff2a00";
+                resultInfo.innerHTML = "<strong>🔥 Şiddetli Patlama!</strong> Maksimum asit-baz oranı, tepkime hızını zirveye ulaştırarak yoğun miktarda CO₂ gazı üretti ve lavları yüksek irtifaya fırlattı!";
+            } else if (eruptionIntensity < 70) {
+                resultInfo.style.borderLeftColor = "#ffb700";
+                resultInfo.innerHTML = "<strong>⚠️ Düşük Basınç.</strong> Moleküler çarpışma sayısı az olduğundan gaz birikimi yetersiz kaldı. Lavlar krater ağzından sızma şeklinde taştı.";
+            } else {
+                resultInfo.style.borderLeftColor = "#00ff88";
+                resultInfo.innerHTML = "<strong>🟢 Dengeli Tepkime.</strong> İdeal kimyasal oranlar sayesinde dengeli bir asit-baz nötrleşmesi gerçekleşti. Gaz çıkışı kararlı ve akışkandır.";
+            }
+        };
+
+        resetBtn.onclick = () => {
+            isErupting = false;
+            particles = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            resultInfo.innerHTML = "Sürgülerle kimyasal oranları belirle yardımıyla \"Tepkimeyi Başlat\" butonuna dokunarak kinetik gaz çıkışını izle.";
+            resultInfo.style.borderLeftColor = "var(--card-border)";
+        };
+
+        // Gelişmiş İnteraktif Cevap Kontrolü
+     function checkAnswer(isCorrect, element) {
+    if(isCorrect) {
+        element.style.background = "rgba(0, 255, 136, 0.15)";
+        element.style.borderColor = "#00ff88";
+        element.style.color = "#00ff88";
+        
+        // OYUN MOTORUNA BAĞLANDI: +50 XP verir ve 'jeoloji' rozetini açar
+        if (typeof addXP === "function") {
+            addXP(50, "jeoloji");
+        }
+        alert("🎉 Harika! Doğru cevap. +50 XP kazandın ve 'Jeoloji Ustası' rozeti hanene kalıcı olarak eklendi!");
+    } else {
+        element.style.background = "rgba(255, 0, 127, 0.15)";
+        element.style.borderColor = "#ff007f";
+        element.style.color = "#ff007f";
+        alert("❌ Yanlış Gaz Seçimi! Tekrar dene.");
+    }
+}
+    </script>
+</body>
+</html>

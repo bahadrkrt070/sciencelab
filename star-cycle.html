@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⭐ Yıldız Evrimi Laboratuvarı | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="js/script.js"></script>
+    <style>
+        :root {
+            --astro-purple: #9b59b6;
+            --star-color: #f1c40f;
+            --nebula-glow: rgba(155, 89, 182, 0.4);
+        }
+
+        .star-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .star-headline h2 {
+            color: var(--astro-purple);
+            margin-bottom: 10px;
+        }
+
+        .star-headline p {
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        /* İki Sütunlu Çalışma Alanı */
+        .star-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .star-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sol Panel: Kontroller */
+        .star-controls {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-item label {
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-item label span {
+            color: var(--astro-purple);
+            font-weight: 600;
+        }
+
+        .star-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .star-btn {
+            background: var(--astro-purple);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .star-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .star-btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Sağ Panel: Görsel Laboratuvar Ekranı */
+        .star-display {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            position: relative;
+        }
+
+        /* Dinamik Yıldız Küresi */
+        .star-sphere {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff, var(--star-color));
+            box-shadow: 0 0 50px 15px var(--nebula-glow);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            user-select: none;
+        }
+
+        .stage-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .stage-desc {
+            color: #ccc;
+            max-width: 500px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Başarı Bildirimi */
+        .success-banner {
+            display: none;
+            grid-column: span 2;
+            background: rgba(155, 89, 182, 0.15);
+            border: 1px solid var(--astro-purple);
+            color: #d291bc;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) { .success-banner { grid-column: span 1; } }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starCanvas"></canvas>
+    <div class="background"></div>
+
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">🔬 <span>ScienceLab</span></a>
+        </div>
+        <div class="header-buttons">
+            <a href="astronomy.html" class="start-now">← Laboratuvara Dön</a>
+        </div>
+    </header>
+
+    <main class="star-container">
+        <div class="star-headline">
+            <h2>⭐ Yıldız Yaşam Döngüsü Laboratuvarı</h2>
+            <p>Bir yıldızın kütlesini belirleyin ve onun milyonlarca yıllık doğum, yaşam ve ölüm sürecini tetikleyin!</p>
+        </div>
+
+        <div class="star-grid">
+            
+            <div class="star-controls">
+                <div class="control-item">
+                    <label>Yıldız Başlangıç Kütlesi:</label>
+                    <select class="star-select" id="massSelect">
+                        <option value="low">Düşük Kütleli Yıldız (Güneş benzeri)</option>
+                        <option value="high">Yüksek Kütleli Yıldız (Dev yıldızlar)</option>
+                    </select>
+                </div>
+
+                <button class="star-btn" id="btnAction">✨ Nükleer Füzyonu Başlat</button>
+                <button class="star-btn" id="btnReset" style="background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);" disabled>🔄 Yeniden Başlat</button>
+            </div>
+
+            <div class="star-display">
+                <div class="star-sphere" id="starVisual">🌌</div>
+                
+                <div class="stage-title" id="stageTitle">Moleküler Bulutsu (Nebula)</div>
+                <div class="stage-desc" id="stageDesc">Yıldızlararası gaz ve toz bulutudur. Kütleçekim kuvvetinin etkisiyle bu bulut çökmeye başlar ve sıcaklık arttıkça bir yıldızın doğumu yaklaşır.</div>
+            </div>
+
+            <div class="success-banner" id="starSuccess">
+                <h3>🎉 Kozmik Evrim Tamamlandı!</h3>
+                <p>Bir yıldızın tüm yaşam döngüsünü simüle ettin ve evrenin madde geri dönüşümünü gözlemledin! <strong>+25 XP</strong> kazandın.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const massSelect = document.getElementById('massSelect');
+            const btnAction = document.getElementById('btnAction');
+            const btnReset = document.getElementById('btnReset');
+            const starVisual = document.getElementById('starVisual');
+            const stageTitle = document.getElementById('stageTitle');
+            const stageDesc = document.getElementById('stageDesc');
+            const successBanner = document.getElementById('starSuccess');
+
+            // Evrim Basamakları Veri Tabanı
+            const evolutionPaths = {
+                low: [
+                    {
+                        title: "Anakol Yıldızı (Sarı Cüce)",
+                        desc: "Güneşimiz gibi kararlı bir yıldız. Çekirdeğinde hidrojeni helyuma dönüştürerek milyarlarca yıl boyunca ışık ve ısı saçar.",
+                        emoji: "☀️",
+                        color: "#f1c40f",
+                        glow: "rgba(241, 196, 15, 0.5)",
+                        size: "100px"
+                    },
+                    {
+                        title: "Kırmızı Dev",
+                        desc: "Yıldızın merkezindeki hidrojen yakıtı bittiğinde dış katmanlar genişler ve soğur. Yıldız devasa bir boyuta ulaşır ancak yüzeyi daha kırmızımsı olur.",
+                        emoji: "🔴",
+                        color: "#e74c3c",
+                        glow: "rgba(231, 76, 60, 0.6)",
+                        size: "180px"
+                    },
+                    {
+                        title: "Gezegenimsi Bulutsu & Beyaz Cüce",
+                        desc: "Yıldız dış katmanlarını uzaya üfler (bulutsu oluşur). Merkezde ise karbon ve oksijenden oluşan, dünyamız boyutunda son derece yoğun, sönmekte olan bir kor kalır: Beyaz Cüce.",
+                        emoji: "⚪",
+                        color: "#ffffff",
+                        glow: "rgba(255, 255, 255, 0.4)",
+                        size: "50px"
+                    }
+                ],
+                high: [
+                    {
+                        title: "Yüksek Kütleli Yıldız (Mavi Dev)",
+                        desc: "Güneş'ten katlarca büyük devasa yıldızlar. Çok yüksek sıcaklıkta çalışırlar, mavi renkte parlarlar ve enerjilerini çok daha hızlı tüketirler.",
+                        emoji: "🔷",
+                        color: "#3498db",
+                        glow: "rgba(52, 152, 219, 0.6)",
+                        size: "150px"
+                    },
+                    {
+                        title: "Kırmızı Üstdev",
+                        desc: "Evrendeki hacimsel olarak en büyük yıldızlardır. Çekirdeklerinde demir elementine kadar ağır atomları sentezlemeye başlarlar. Devasa bir genişleme yaşanır.",
+                        emoji: "⭕",
+                        color: "#c0392b",
+                        glow: "rgba(192, 41, 43, 0.7)",
+                        size: "220px"
+                    },
+                    {
+                        title: "Süpernova Patlaması & Kara Delik / Nötron Yıldızı",
+                        desc: "Demir çekirdek daha fazla dayanamaz ve evrenin en büyük patlamalarından biri olan Süpernova gerçekleşir. Geriye ya son derece yoğun bir Nötron Yıldızı ya da bir Kara Delik kalır!",
+                        emoji: "🕳️",
+                        color: "#000000",
+                        glow: "rgba(155, 89, 182, 0.8)",
+                        size: "70px"
+                    }
+                ]
+            };
+
+            let currentStep = -1;
+            let chosenPath = "";
+            let xpGranted = false;
+
+            btnAction.addEventListener('click', () => {
+                // Döngü yeni başlıyorsa
+                if (currentStep === -1) {
+                    chosenPath = massSelect.value;
+                    massSelect.disabled = true;
+                    btnReset.disabled = false;
+                }
+
+                currentStep++;
+                const pathData = evolutionPaths[chosenPath];
+
+                if (currentStep < pathData.length) {
+                    const currentStage = pathData[currentStep];
+
+                    // Görsel güncellemeler
+                    starVisual.textContent = currentStage.emoji;
+                    starVisual.style.width = currentStage.size;
+                    starVisual.style.height = currentStage.size;
+                    starVisual.style.background = `radial-gradient(circle, #fff, ${currentStage.color})`;
+                    starVisual.style.boxShadow = `0 0 50px 20px ${currentStage.glow}`;
+
+                    // Metin güncellemeleri
+                    stageTitle.textContent = currentStage.title;
+                    stageDesc.textContent = currentStage.desc;
+
+                    // Buton metni güncelleme
+                    if (currentStep === pathData.length - 1) {
+                        btnAction.textContent = "⌛ Yaşam Döngüsü Bitti";
+                        btnAction.disabled = true;
+                        triggerXPReward();
+                    } else {
+                        btnAction.textContent = "⏩ Milyonlarca Yıl İleri Sar";
+                    }
+                }
+            });
+
+            // Sıfırlama Mekanizması
+            btnReset.addEventListener('click', () => {
+                currentStep = -1;
+                chosenPath = "";
+                massSelect.disabled = false;
+                btnAction.disabled = false;
+                btnAction.textContent = "✨ Nükleer Füzyonu Başlat";
+                btnReset.disabled = true;
+
+                // Fabrika Ayarlarına Dönüş
+                starVisual.textContent = "🌌";
+                starVisual.style.width = "120px";
+                starVisual.style.height = "120px";
+                starVisual.style.background = "radial-gradient(circle, #fff, var(--astro-purple))";
+                starVisual.style.boxShadow = "0 0 50px 15px var(--nebula-glow)";
+                stageTitle.textContent = "Moleküler Bulutsu (Nebula)";
+                stageDesc.textContent = "Yıldızlararası gaz ve toz bulutudur. Kütleçekim kuvvetinin etkisiyle bu bulut çökmeye başlar ve sıcaklık arttıkça bir yıldızın doğumu yaklaşır.";
+            });
+
+            function triggerXPReward() {
+                if (!xpGranted) {
+                    successBanner.style.display = 'block';
+                    xpGranted = true;
+
+                    if (window.opener && typeof window.opener.gainXP === "function") {
+                        window.opener.gainXP(25);
+                    } else {
+                        let currentXP = parseInt(localStorage.getItem('scienceLab_xp')) || 0;
+                        localStorage.setItem('scienceLab_xp', currentXP + 25);
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

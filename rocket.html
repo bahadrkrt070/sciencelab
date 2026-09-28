@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Profesyonel Roket Fırlatma Simülasyonu | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2 family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .sim-container { display: flex; gap: 40px; margin-top: 120px; padding: 0 8%; align-items: stretch; }
+        
+        /* Kontrol Merkezi Fırlatma Ekranı */
+        .sim-screen { 
+            flex: 1.3; 
+            background: #0c1020; 
+            border: 2px solid rgba(0, 210, 255, 0.2); 
+            border-radius: 24px; 
+            height: 580px; 
+            position: relative; 
+            overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
+        }
+        
+        #rocketCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        /* Uçuş Telemetri Göstergeleri overlay */
+        .telemetry-overlay {
+            position: absolute;
+            top: 20px; left: 20px;
+            z-index: 5;
+            background: rgba(11, 15, 25, 0.8);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            padding: 15px; border-radius: 12px;
+            font-family: monospace; font-size: 13px; color: #00ff88;
+            pointer-events: none; backdrop-filter: blur(5px);
+        }
+        .telemetry-overlay div { margin-bottom: 5px; }
+
+        /* Kumanda Paneli */
+        .sim-controls { flex: 0.7; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 35px; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .control-group { margin-bottom: 20px; }
+        .control-group label { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; font-size: 14px; }
+        .control-group label span { color: var(--primary); }
+        .control-group input[type="range"] { 
+            width: 100%; -webkit-appearance: none; background: rgba(255,255,255,0.1); height: 8px; border-radius: 5px; outline: none;
+        }
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 0 10px var(--primary-glow);
+        }
+        
+        .launch-btn { 
+            width: 100%; background: linear-gradient(135deg, #00ff88, #00aeff); color: #05070c; border: none; padding: 16px; border-radius: 30px; font-weight: 800; font-size: 16px; cursor: pointer; 
+            box-shadow: 0 6px 20px rgba(0,255,136,0.3); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .launch-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,255,136,0.5); }
+        
+        .abort-btn { width: 100%; background: transparent; border: 2px solid var(--card-border); color: var(--text-color); padding: 12px; border-radius: 30px; font-weight: 600; margin-top: 12px; cursor: pointer; transition: 0.2s; }
+        .abort-btn:hover { background: rgba(255, 0, 127, 0.1); border-color: #ff007f; color: #ff007f; }
+
+        #resultInfo {
+            background: rgba(255,255,255,0.02); border-left: 4px solid var(--card-border); padding: 15px; border-radius: 0 12px 12px 0; font-size: 14px; color: var(--text-muted); line-height: 1.6;
+        }
+
+        /* Quiz Kutusu */
+        .quiz-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; margin: 40px 8% 50px 8%; padding: 40px; }
+        .quiz-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 25px; }
+        .quiz-option { background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); padding: 18px 25px; border-radius: 14px; cursor: pointer; transition: all 0.2s ease; font-weight: 500; }
+        .quiz-option:hover { background: rgba(0, 210, 255, 0.05); border-color: var(--primary); transform: translateX(5px); }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo"><a href="index.html">🔬 <span>ScienceLab</span></a></div>
+        <nav class="navbar">
+            <a href="index.html">Ana Sayfa</a>
+            <a href="laboratories.html">Laboratuvarlar</a>
+            <a class="active" href="experiments.html">Deneyler</a>
+            <a href="about.html">Hakkımızda</a>
+            <a href="contact.html">İletişim</a>
+        </nav>
+        <div class="header-buttons">
+            <button id="themeToggle">🌙</button>
+            <a href="index.html" class="start-now">← Geri Dön</a>
+        </div>
+    </header>
+
+    <div class="sim-container">
+        <div class="sim-screen" id="simScreen">
+            <div class="telemetry-overlay">
+                <div>🚀 STATÜ: <span id="telStatus" style="color:#fff;">HAZIR</span></div>
+                <div>📈 İRTİFA: <span id="telAltitude">0</span> km</div>
+                <div>⚡ HIZ: <span id="telSpeed">0</span> km/s</div>
+                <div>⛽ YAKIT: <span id="telFuel">100</span> %</div>
+            </div>
+            <canvas id="rocketCanvas"></canvas>
+        </div>
+
+        <div class="sim-controls">
+            <div>
+                <span style="color: #00ff88; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Uzay Mühendisliği Pro</span>
+                <h2 style="margin: 5px 0 25px 0; font-weight: 800;">Yörünge Dinamiği</h2>
+                
+                <div class="control-group">
+                    <label>Yakıt Deposu Kapasitesi <span id="fuelVal">6000 kg</span></label>
+                    <input type="range" id="fuelInput" min="2000" max="10000" step="500" value="6000">
+                </div>
+
+                <div class="control-group">
+                    <label>Faydalı Yük Ağırlığı (Kargo) <span id="payloadInputVal">3000 kg</span></label>
+                    <input type="range" id="payloadInput" min="1000" max="8000" step="500" value="3000">
+                </div>
+            </div>
+
+            <div>
+                <button id="launchBtn" class="launch-btn">🚀 GERİ SAYIMI BAŞLAT (IGNITION)</button>
+                <button id="abortBtn" class="abort-btn">🛑 SIFIRLA / TEMİZLE</button>
+                
+                <div id="resultInfo" style="margin-top: 25px;">
+                    Yakıt ve yük dengesini hesapla. Doğru itki-kütle oranına ulaştığında roketi ateşle ve atmosferik aşamaları takip et.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="quiz-section">
+        <span style="color: var(--primary); font-weight: 700; font-size: 14px; text-transform: uppercase;">🧠 Roket Fiziği Değerlendirmesi</span>
+        <h2 style="margin: 8px 0 15px 0; font-weight: 800;">Roketlerin uzaydaki havasız (vakum) ortamda bile hareket edebilmesini sağlayan temel prensip hangisidir?</h2>
+        
+        <div class="quiz-grid">
+            <div class="quiz-option" onclick="checkAnswer(false, this)">A) Atmosferdeki hava akımından destek almaları.</div>
+            <div class="quiz-option" onclick="checkAnswer(true, this)">B) Newton'un Etki-Tepki Kanunu ve kendi içlerinde Oksijen (Oksitleyici) taşımaları.</div>
+            <div class="quiz-option" onclick="checkAnswer(false, this)">C) Güneş rüzgarlarının yarattığı manyetik itme kuvveti.</div>
+        </div>
+    </section>
+
+    <script>
+        const fuelInput = document.getElementById('fuelInput');
+        const payloadInput = document.getElementById('payloadInput');
+        const fuelVal = document.getElementById('fuelVal');
+        const payloadInputVal = document.getElementById('payloadInputVal');
+        
+        fuelInput.oninput = () => fuelVal.textContent = fuelInput.value + " kg";
+        payloadInput.oninput = () => payloadInputVal.textContent = payloadInput.value + " kg";
+
+        const canvas = document.getElementById('rocketCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let animationFrame;
+        let flightState = "ready"; // ready, countdown, thrust, stage1, orbit, failed
+        let countdownTimer = 5;
+        
+        // Simülasyon Telemetri Verileri
+        let altitude = 0;
+        let speed = 0;
+        let remainingFuel = 100;
+        let initialFuel = 0;
+        let payloadWeight = 0;
+        
+        // Parçacıklar (Ateş ve Yıldız efektleri için)
+        let fireParticles = [];
+        let stars = [];
+
+        function resizeCanvas() {
+            const screen = document.getElementById('simScreen');
+            canvas.width = screen.offsetWidth;
+            canvas.height = screen.offsetHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Arka plan yıldız havuzu
+        for(let i=0; i<60; i++) {
+            stars.push({x: Math.random()*800, y: Math.random()*600, size: Math.random()*1.5});
+        }
+
+        // Yangın / İtki Egzoz Parçacık Yapısı
+        class FireParticle {
+            constructor(x, y, scale = 1) {
+                this.x = x + (Math.random() * 10 - 5);
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = Math.random() * 6 + 4;
+                this.size = (Math.random() * 6 + 4) * scale;
+                this.alpha = 1;
+                this.color = `hsl(${Math.random() * 25 + 10}, 100%, 50%)`; // Sarı-Kırmızı tonlar
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= 0.025;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function drawBackground() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // İrtifaya göre atmosfer rengini dinamik değiştir (Gökyüzü kararması)
+            let skyGlow = Math.max(0, 1 - (altitude / 120)); // 120km'de tamamen uzay
+            
+            let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            if(flightState === "orbit") {
+                gradient.addColorStop(0, '#04060a');
+                gradient.addColorStop(1, '#080d1a');
+            } else {
+                gradient.addColorStop(0, `rgba(4, 6, 10, 1)`);
+                gradient.addColorStop(1, `rgba(${Math.floor(15 * skyGlow)}, ${Math.floor(60 * skyGlow)}, ${Math.floor(140 * skyGlow)}, 1)`);
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Yıldızları çiz (Yalnızca roket yukarı çıktıkça aşağı kaysınlar - Paralaks)
+            ctx.fillStyle = "rgba(255,255,255,0.7)";
+            stars.forEach(s => {
+                if(flightState === "thrust" || flightState === "stage1") {
+                    s.y += (speed * 0.1);
+                    if(s.y > canvas.height) { s.y = 0; s.x = Math.random()*canvas.width; }
+                }
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Yeryüzü çizgisi (Sadece kalkışta görünür)
+            if(altitude < 20) {
+                ctx.fillStyle = "#1c2436";
+                ctx.fillRect(0, canvas.height - 30 + (altitude * 1.5), canvas.width, 30);
+            }
+        }
+
+        function drawRocket(x, y) {
+            ctx.save();
+            
+            // Yörüngede roketi hafif yatay çevir
+            if(flightState === "orbit") {
+                ctx.translate(x, y);
+                ctx.rotate(Math.PI / 3); // 60 derece eğim
+                ctx.translate(-x, -y);
+            }
+
+            // Roket Gövdesi (Vektörel Çizim)
+            ctx.fillStyle = "#e2e8f0"; // Beyaz Ana Gövde
+            ctx.fillRect(x - 12, y - 60, 24, 70);
+
+            // Burun Konisi (Üst Kısım)
+            ctx.beginPath();
+            ctx.moveTo(x - 12, y - 60);
+            ctx.lineTo(x, y - 85);
+            ctx.lineTo(x + 12, y - 60);
+            ctx.fillStyle = "#ef4444"; // Kırmızı Burun
+            ctx.fill();
+
+            // Kanatçıklar (Fins)
+            ctx.beginPath();
+            ctx.moveTo(x - 12, y + 10);
+            ctx.lineTo(x - 22, y + 20);
+            ctx.lineTo(x - 12, y + 20);
+            ctx.fillStyle = "#ef4444";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(x + 12, y + 10);
+            ctx.lineTo(x + 22, y + 20);
+            ctx.lineTo(x + 12, y + 20);
+            ctx.fill();
+
+            // Kargo Kapak Çizgisi veya Pencere
+            ctx.beginPath();
+            ctx.arc(x, y - 35, 5, 0, Math.PI * 2);
+            ctx.fillStyle = "#00d2ff";
+            ctx.fill();
+
+            // Alt Booster Ayrılma Çizgisi (Birinci Aşama)
+            if(flightState === "thrust") {
+                ctx.strokeStyle = "#94a3b8";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x - 12, y - 10);
+                ctx.lineTo(x + 12, y - 10);
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function flightLoop() {
+            drawBackground();
+
+            let rX = canvas.width / 2;
+            let rY = canvas.height - 50;
+
+            if (flightState === "countdown") {
+                drawRocket(rX, rY);
+                ctx.fillStyle = "#ff007f";
+                ctx.font = "bold 40px monospace";
+                ctx.textAlign = "center";
+                ctx.fillText(countdownTimer, canvas.width / 2, canvas.height / 2 - 50);
+            } 
+            else if (flightState === "thrust" || flightState === "stage1") {
+                // Fizik Hesaplama Motoru
+                let thrustForce = initialFuel * 0.12; 
+                let totalMass = payloadWeight + (initialFuel * (remainingFuel / 100));
+                let acceleration = (thrustForce / totalMass) - 0.098; // Kuvvet / Kütle - Yerçekimi ivmesi
+                
+                speed += acceleration;
+                altitude += (speed * 0.01);
+                remainingFuel -= (flightState === "thrust" ? 0.3 : 0.15); // Yakıt tüketimi
+
+                // Telemetri Güncelleme
+                document.getElementById('telAltitude').textContent = Math.floor(altitude);
+                document.getElementById('telSpeed').textContent = (speed * 100).toFixed(0);
+                document.getElementById('telFuel').textContent = Math.max(0, Math.floor(remainingFuel));
+
+                // Egzoz ateşi parçacıkları üret
+                let fireScale = flightState === "thrust" ? 1.2 : 0.7;
+                fireParticles.push(new FireParticle(rX, rY + 15, fireScale));
+
+                // Aşama Ayrılması (Stage Separation Kontrolü)
+                if(remainingFuel <= 50 && flightState === "thrust") {
+                    flightState = "stage1";
+                    document.getElementById('telStatus').textContent = "STAGE 1 SEPARATION";
+                    document.getElementById('telStatus').style.color = "#00d2ff";
+                }
+
+                // Başarı / Başarısızlık Eşik Kontrolleri
+                if (remainingFuel <= 0) {
+                    if (altitude >= 100 && speed > 5) {
+                        flightState = "orbit";
+                    } else {
+                        flightState = "failed";
+                    }
+                }
+
+                drawRocket(rX, rY - Math.min(150, altitude * 2));
+            } 
+            else if (flightState === "orbit") {
+                document.getElementById('telStatus').textContent = "ORBIT INSERTION SUCCESS";
+                document.getElementById('telStatus').style.color = "#00ff88";
+                document.getElementById('resultInfo').innerHTML = "<strong>🎉 Görev Başarılı!</strong> Kusursuz hesaplama. Roket yerçekimi eşiğini (Karman Hattı) aşarak tam kararlı Dünya yörüngesine oturdu ve haberleşme uydusunu başarıyla uzaya bıraktı!";
+                
+                // Yörüngede süzülen roket çizimi
+                drawRocket(canvas.width / 2, canvas.height / 2);
+            } 
+            else if (flightState === "failed") {
+                document.getElementById('telStatus').textContent = "MISSION FAILED";
+                document.getElementById('telStatus').style.color = "#ff007f";
+                
+                if (altitude < 100) {
+                    document.getElementById('resultInfo').innerHTML = "<strong>❌ Başarısız Kalkış!</strong> Yakıt yetersiz kaldı veya faydalı yük roket için çok ağırdı. Roket Karman hattına (100km) ulaşamadan atmosferde çakıldı. İdeal oranları tekrar bulmayı dene.";
+                }
+                drawRocket(rX, rY);
+            }
+            else {
+                // Standart Hazır Bekleme Modu
+                drawRocket(rX, rY);
+            }
+
+            // Ateş partiküllerini yürüt ve çiz
+            for (let i = fireParticles.length - 1; i >= 0; i--) {
+                fireParticles[i].update();
+                fireParticles[i].draw();
+                if (fireParticles[i].alpha <= 0) fireParticles.splice(i, 1);
+            }
+
+            animationFrame = requestAnimationFrame(flightLoop);
+        }
+
+        // Fırlatma Butonları Kontrolü
+        const launchBtn = document.getElementById('launchBtn');
+        const abortBtn = document.getElementById('abortBtn');
+        const resultInfo = document.getElementById('resultInfo');
+
+        launchBtn.onclick = () => {
+            if(flightState !== "ready") return;
+            
+            initialFuel = parseInt(fuelInput.value);
+            payloadWeight = parseInt(payloadInput.value);
+            
+            flightState = "countdown";
+            countdownTimer = 5;
+            document.getElementById('telStatus').textContent = "COUNTDOWN";
+            document.getElementById('telStatus').style.color = "#ffb700";
+
+            let timer = setInterval(() => {
+                countdownTimer--;
+                if(countdownTimer <= 0) {
+                    clearInterval(timer);
+                    flightState = "thrust";
+                    document.getElementById('telStatus').textContent = "MAIN ENGINE IGNITION";
+                    document.getElementById('telStatus').style.color = "#ff3300";
+                }
+            }, 1000);
+        };
+
+        abortBtn.onclick = () => {
+            cancelAnimationFrame(animationFrame);
+            flightState = "ready";
+            altitude = 0;
+            speed = 0;
+            remainingFuel = 100;
+            fireParticles = [];
+            
+            document.getElementById('telStatus').textContent = "HAZIR";
+            document.getElementById('telStatus').style.color = "#fff";
+            document.getElementById('telAltitude').textContent = "0";
+            document.getElementById('telSpeed').textContent = "0";
+            document.getElementById('telFuel').textContent = "100";
+            resultInfo.innerHTML = "Yakıt ve yük dengesini hesapla. Doğru itki-kütle oranına ulaştığında roketi ateşle ve atmosferik aşamaları takip et.";
+        };
+
+        // İlk Döngü Tetikleyici
+        flightLoop();
+
+        // Quiz Cevap Kontrolü
+function checkAnswer(isCorrect, element) {
+    if(isCorrect) {
+        element.style.background = "rgba(0, 255, 136, 0.15)";
+        element.style.borderColor = "#00ff88";
+        element.style.color = "#00ff88";
+        
+        // OYUN MOTORUNA BAĞLANDI: +50 XP verir ve 'uzay' rozetini açar
+        if (typeof addXP === "function") {
+            addXP(50, "uzay");
+        }
+        alert("🎉 Mükemmel! Doğru cevap. +50 XP kazandın ve 'Uzay Kaşifi' rozeti kilidi kalıcı olarak açıldı!");
+    } else {
+        element.style.background = "rgba(255, 0, 127, 0.15)";
+        element.style.borderColor = "#ff007f";
+        element.style.color = "#ff007f";
+        alert("❌ Yanlış Teorem! Yeniden düşün.");
+    }
+}
+    </script>
+</body>
+</html>

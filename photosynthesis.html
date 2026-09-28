@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 Fotosentez Hızı Laboratuvarı | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="js/script.js"></script>
+    <style>
+        :root {
+            --bio-green: #2ecc71;
+            --light-color: #f1c40f;
+        }
+
+        .photo-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .photo-headline h2 {
+            color: var(--bio-green);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .photo-headline p {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        /* Çalışma Alanı Düzeni */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .photo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sol Panel: Kontroller */
+        .control-panel {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-group label span {
+            color: var(--bio-green);
+            font-weight: 600;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            accent-color: var(--bio-green);
+            cursor: pointer;
+        }
+
+        /* Işık Rengi Seçimi */
+        .color-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .color-btn {
+            border: 2px solid transparent;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .color-btn.red { background-color: #e74c3c; }
+        .color-btn.green { background-color: #2ecc71; }
+        .color-btn.blue { background-color: #3498db; }
+
+        .color-btn.active {
+            border-color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        /* Sağ Panel: Görsel Simülasyon */
+        .sim-display {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            min-height: 450px;
+        }
+
+        /* Bitki ve Akvaryum Alanı */
+        .aquarium {
+            width: 200px;
+            height: 250px;
+            background: linear-gradient(180deg, rgba(52, 152, 219, 0.2), rgba(41, 128, 185, 0.5));
+            border: 4px solid #34495e;
+            border-radius: 10px;
+            position: relative;
+            margin-top: 40px;
+            overflow: hidden;
+        }
+
+        .plant {
+            font-size: 5rem;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            user-select: none;
+        }
+
+        /* Kabarcık (Oksijen) Animasyon Alanı */
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            bottom: 40px;
+            animation: floatUp 2s infinite linear;
+            z-index: 1;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(0.6);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-200px) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Canlı Gösterge Paneli */
+        .speed-counter {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 1px solid var(--card-border);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .speed-counter span {
+            color: var(--bio-green);
+        }
+
+        /* Başarı Bildirimi */
+        .success-banner {
+            display: none;
+            grid-column: span 2;
+            background: rgba(46, 204, 113, 0.15);
+            border: 1px solid var(--bio-green);
+            color: var(--bio-green);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        @media (max-width: 900px) { .success-banner { grid-column: span 1; } }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starCanvas"></canvas>
+    <div class="background"></div>
+
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">🔬 <span>ScienceLab</span></a>
+        </div>
+        <div class="header-buttons">
+            <a href="biology.html" class="start-now">← Laboratuvara Dön</a>
+        </div>
+    </header>
+
+    <main class="photo-container">
+        <div class="photo-headline">
+            <h2>🌱 Fotosentez Hızı Laboratuvarı</h2>
+            <p>Çevresel faktörleri değiştirerek bitkinin oksijen üretim hızını (fotosentez oranını) gözlemleyin!</p>
+        </div>
+
+        <div class="photo-grid">
+            
+            <div class="control-panel">
+                
+                <div class="control-group">
+                    <label>Işık Şiddeti: <span id="lightVal">50%</span></label>
+                    <input type="range" id="lightIntensity" min="0" max="100" value="50">
+                </div>
+
+                <div class="control-group">
+                    <label>Karbondioksit (CO₂): <span id="co2Val">Düşük</span></label>
+                    <input type="range" id="co2Level" min="1" max="3" value="1">
+                </div>
+
+                <div class="control-group">
+                    <label>Işık Rengi (Dalga Boyu):</label>
+                    <div class="color-selector">
+                        <button class="color-btn red" data-color="red">Kırmızı</button>
+                        <button class="color-btn green active" data-color="green">Yeşil</button>
+                        <button class="color-btn blue" data-color="blue">Mavi</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="sim-display">
+                
+                <div class="speed-counter">
+                    Fotosentez Hızı: <span id="speedRate">0</span> kabarcık/dk
+                </div>
+
+                <div class="aquarium" id="aquariumEnv">
+                    <div class="plant">🌿</div>
+                    </div>
+
+                <div style="color: #888; font-size: 0.85rem; margin-top: 15px;">
+                    💡 İpucu: Klorofil en az yeşil ışığı, en çok ise kırmızı ve mavi ışığı emer!
+                </div>
+
+            </div>
+
+            <div class="success-banner" id="photoSuccess">
+                <h3>🎉 Harika Koşullar! Maksimum Fotosentez Verimi Sağlandı!</h3>
+                <p>Doğru ışık dalga boyunu ve çevre şartlarını kombine ederek bitkiyi coşturdun! Profiline <strong>+30 XP</strong> eklendi.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const lightSlider = document.getElementById('lightIntensity');
+            const co2Slider = document.getElementById('co2Level');
+            const colorButtons = document.querySelectorAll('.color-btn');
+            const aquarium = document.getElementById('aquariumEnv');
+            const speedRateDisplay = document.getElementById('speedRate');
+            const successBanner = document.getElementById('photoSuccess');
+
+            let activeColor = 'green';
+            let xpGranted = false;
+
+            // CO₂ Metin Eşleşmesi
+            const co2Labels = { 1: "Düşük", 2: "Orta", 3: "Yüksek" };
+
+            function updateSimulation() {
+                const light = parseInt(lightSlider.value);
+                const co2 = parseInt(co2Slider.value);
+                
+                // Eleman değer metinlerini güncelle
+                document.getElementById('lightVal').textContent = light + "%";
+                document.getElementById('co2Val').textContent = co2Labels[co2];
+
+                // Renk çarpanı (Biyolojik kural: Yeşil ışıkta fotosentez hızı çok düşüktür!)
+                let colorMultiplier = 1;
+                if (activeColor === 'green') colorMultiplier = 0.2;
+                if (activeColor === 'red') colorMultiplier = 0.9;
+                if (activeColor === 'blue') colorMultiplier = 1.2;
+
+                // Fotosentez Hız Formulü (Temel Hesaplama)
+                let calculatedSpeed = Math.round((light * 1.5) * (co2 * 0.8) * colorMultiplier);
+                
+                // Işık şiddeti sıfırsa hız doğrudan sıfırdır
+                if (light === 0) calculatedSpeed = 0;
+
+                speedRateDisplay.textContent = calculatedSpeed;
+
+                // Ekrandaki kabarcıkları temizle ve hıza göre yeniden üret
+                document.querySelectorAll('.bubble').forEach(b => b.remove());
+
+                // Maksimum 25 kabarcık görsel limitiyle animasyon ekleme
+                const bubbleCount = Math.min(Math.floor(calculatedSpeed / 4), 25);
+                
+                for (let i = 0; i < bubbleCount; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+                    
+                    // Rastgele yatay konum ve animasyon gecikmesi
+                    bubble.style.left = Math.random() * 80 + 10 + '%';
+                    bubble.style.animationDelay = Math.random() * 2 + 's';
+                    // Hıza göre animasyon süresini kısaltma (daha hızlı yükselme)
+                    bubble.style.animationDuration = (2.5 - (co2 * 0.4)) + 's';
+                    
+                    // Rastgele boyut
+                    const size = Math.random() * 6 + 4 + 'px';
+                    bubble.style.width = size;
+                    bubble.style.height = size;
+
+                    aquarium.appendChild(bubble);
+                }
+
+                // BAŞARI KOŞULUNUN KONTROLÜ (Örn: Mavi veya Kırmızı ışıkta, yüksek CO2 ve yüksek ışıkta)
+                if (calculatedSpeed >= 120 && !xpGranted) {
+                    successBanner.style.display = 'block';
+                    xpGranted = true;
+
+                    // Platform XP sistemini tetikle
+                    if (window.opener && typeof window.opener.gainXP === "function") {
+                        window.opener.gainXP(30);
+                    } else {
+                        let currentXP = parseInt(localStorage.getItem('scienceLab_xp')) || 0;
+                        localStorage.setItem('scienceLab_xp', currentXP + 30);
+                    }
+                }
+            }
+
+            // Olay Dinleyicileri (Listeners)
+            lightSlider.addEventListener('input', updateSimulation);
+            co2Slider.addEventListener('input', updateSimulation);
+
+            colorButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    colorButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeColor = btn.getAttribute('data-color');
+                    updateSimulation();
+                });
+            });
+
+            // İlk açılışta simülasyonu bir kez çalıştır
+            updateSimulation();
+        });
+    </script>
+
+</body>
+</html>

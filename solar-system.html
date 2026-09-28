@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🪐 Güneş Sistemi Simülasyonu | ScienceLab</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="js/script.js"></script>
+    <style>
+        :root {
+            --astro-purple: #9b59b6;
+            --sun-glow: rgba(241, 196, 15, 0.4);
+        }
+
+        .system-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .system-headline h2 {
+            color: var(--astro-purple);
+            margin-bottom: 10px;
+        }
+
+        .system-headline p {
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        /* 3D Uzay Sahnesi */
+        .space-stage {
+            width: 100%;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            /* 3D Perspektif Derinliği */
+            perspective: 1000px;
+        }
+
+        /* Yörünge Düzlemi (3D Eğiklik Efekti) */
+        .orbit-plane {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform: rotateX(65deg) rotateY(-10deg);
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        /* Güneş Merkezi */
+        .sun {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60px;
+            height: 60px;
+            margin-top: -30px;
+            margin-left: -30px;
+            background: radial-gradient(circle, #fff 20%, #f1c40f 60%, #f39c12 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 40px 15px var(--sun-glow);
+            transform: rotateX(-65deg); /* Güneşin dik durması için ters eğim */
+            z-index: 10;
+        }
+
+        /* Genel Yörünge Halkası Şablonu */
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transform-style: preserve-3d;
+            animation: spin linear infinite;
+        }
+
+        .orbit.hidden-lines {
+            border-color: transparent !important;
+        }
+
+        /* Gezegen Küresi Şablonu */
+        .planet {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            border-radius: 50%;
+            transform: translateX(-50%) rotateX(-65deg); /* Dik durma düzeltmesi */
+        }
+
+        /* --- Gezegen Özellikleri (Mesafe, Boyut, Dönüş Süreleri) --- */
+        
+        /* 1. Merkür */
+        .mercury-orbit {
+            width: 120px; height: 120px;
+            margin-top: -60px; margin-left: -60px;
+            animation-duration: 4s;
+        }
+        .mercury { width: 10px; height: 10px; background: #95a5a6; }
+
+        /* 2. Venüs */
+        .venus-orbit {
+            width: 180px; height: 180px;
+            margin-top: -90px; margin-left: -90px;
+            animation-duration: 7s;
+        }
+        .venus { width: 14px; height: 14px; background: #e67e22; }
+
+        /* 3. Dünya */
+        .earth-orbit {
+            width: 260px; height: 260px;
+            margin-top: -130px; margin-left: -130px;
+            animation-duration: 10s;
+        }
+        .earth { width: 16px; height: 16px; background: #3498db; box-shadow: 0 0 8px #3498db; }
+
+        /* 4. Mars */
+        .mars-orbit {
+            width: 340px; height: 340px;
+            margin-top: -170px; margin-left: -170px;
+            animation-duration: 14s;
+        }
+        .mars { width: 12px; height: 12px; background: #e74c3c; }
+
+        /* 5. Jüpiter */
+        .jupiter-orbit {
+            width: 440px; height: 440px;
+            margin-top: -220px; margin-left: -220px;
+            animation-duration: 22s;
+        }
+        .jupiter { width: 26px; height: 26px; background: #d35400; }
+
+        /* Yörünge Dönüş Animasyonu */
+        @keyframes spin {
+            from { transform: rotateZ(0deg); }
+            to { transform: rotateZ(360deg); }
+        }
+
+        /* Kontrol Butonları Paneli */
+        .controls-bar {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .astro-btn-ui {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .astro-btn-ui:hover {
+            background: var(--astro-purple);
+            border-color: var(--astro-purple);
+            box-shadow: 0 0 10px var(--astro-purple);
+        }
+
+        /* Başarı Bildirimi */
+        .success-banner {
+            display: none;
+            background: rgba(155, 89, 182, 0.15);
+            border: 1px solid var(--astro-purple);
+            color: #d291bc;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starCanvas"></canvas>
+    <div class="background"></div>
+
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">🔬 <span>ScienceLab</span></a>
+        </div>
+        <div class="header-buttons">
+            <a href="astronomy.html" class="start-now">← Laboratuvara Dön</a>
+        </div>
+    </header>
+
+    <main class="system-container">
+        <div class="system-headline">
+            <h2>🪐 3D Güneş Sistemi Simülatörü</h2>
+            <p>Gezegenlerin 3 boyutlu yörünge düzlemini kontrol et, dönüş hızlarını gözlemle ve uzay keşfine başla!</p>
+        </div>
+
+        <div class="space-stage">
+            <div class="orbit-plane" id="plane">
+                
+                <div class="sun"></div>
+
+                <div class="orbit mercury-orbit">
+                    <div class="planet mercury"></div>
+                </div>
+
+                <div class="orbit venus-orbit">
+                    <div class="planet venus"></div>
+                </div>
+
+                <div class="orbit earth-orbit">
+                    <div class="planet earth"></div>
+                </div>
+
+                <div class="orbit mars-orbit">
+                    <div class="planet mars"></div>
+                </div>
+
+                <div class="orbit jupiter-orbit">
+                    <div class="planet jupiter"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="controls-bar">
+            <button class="astro-btn-ui" id="btnSpeed">⚡ Süper Hız</button>
+            <button class="astro-btn-ui" id="btnToggleLines">🌐 Yörüngeleri Gizle/Göster</button>
+            <button class="astro-btn-ui" id="btnAngle">📐 Bakış Açısını Değiştir</button>
+        </div>
+
+        <div class="success-banner" id="astroSuccess">
+            <h3>🎉 Tebrikler! Kozmos Kaşifi Oldun!</h3>
+            <p>Güneş Sistemi simülasyonunu başarıyla çalıştırdın ve inceledin! Hesabına <strong>+20 XP</strong> eklendi.</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const plane = document.getElementById('plane');
+            const orbits = document.querySelectorAll('.orbit');
+            const btnSpeed = document.getElementById('btnSpeed');
+            const btnToggleLines = document.getElementById('btnToggleLines');
+            const btnAngle = document.getElementById('btnAngle');
+            const successBanner = document.getElementById('astroSuccess');
+
+            let isFast = false;
+            let currentAngle = 65; // Varsayılan rotX eğimi
+            let xpGranted = false;
+
+            // 1. Hızlandırma Kontrolü
+            btnSpeed.addEventListener('click', () => {
+                isFast = !isFast;
+                orbits.forEach(orbit => {
+                    let currentDuration = parseFloat(window.getComputedStyle(orbit).animationDuration);
+                    if (isFast) {
+                        orbit.style.animationDuration = (currentDuration / 4) + 's';
+                        btnSpeed.textContent = "🐢 Normal Hız";
+                        btnSpeed.style.background = "#e74c3c";
+                    } else {
+                        orbit.style.animationDuration = (currentDuration * 4) + 's';
+                        btnSpeed.textContent = "⚡ Süper Hız";
+                        btnSpeed.style.background = "rgba(255,255,255,0.05)";
+                    }
+                });
+                triggerXPReward();
+            });
+
+            // 2. Yörünge Çizgilerini Gizleme
+            btnToggleLines.addEventListener('click', () => {
+                orbits.forEach(orbit => {
+                    orbit.classList.toggle('hidden-lines');
+                });
+                triggerXPReward();
+            });
+
+            // 3. 3D Bakış Açısı Eğimi Değiştirme
+            btnAngle.addEventListener('click', () => {
+                currentAngle = currentAngle === 65 ? 30 : (currentAngle === 30 ? 0 : 65);
+                plane.style.transform = `rotateX(${currentAngle}deg) rotateY(-10deg)`;
+                
+                // Gezegen kürelerinin dik kalması için onların da ters açılarını düzeltelim
+                document.querySelectorAll('.planet').forEach(planet => {
+                    planet.style.transform = `translateX(-50%) rotateX(-${currentAngle}deg)`;
+                });
+                triggerXPReward();
+            });
+
+            // XP Ödülünü Veren Fonksiyon (Kullanıcı etkileşime girdiğinde çalışır)
+            function triggerXPReward() {
+                if (!xpGranted) {
+                    successBanner.style.display = 'block';
+                    xpGranted = true;
+
+                    if (window.opener && typeof window.opener.gainXP === "function") {
+                        window.opener.gainXP(20);
+                    } else {
+                        let currentXP = parseInt(localStorage.getItem('scienceLab_xp')) || 0;
+                        localStorage.setItem('scienceLab_xp', currentXP + 20);
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
